@@ -1,0 +1,68 @@
+services:
+  api:
+    container_name: sales-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+    ports:
+      - ${API_PORT}:${API_PORT}
+    depends_on:
+      - db
+      - redis
+    env_file:
+      - .env
+
+  db:
+    container_name: sales-pgsql
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    expose:
+      - 5432
+
+  redis:
+    container_name: sales-redis
+    image: redis:alpine
+    restart: always
+    volumes:
+      - redis_data:/data
+    expose:
+      - 6379
+
+  migration:
+    build: .
+    command: bash -c "alembic upgrade head"
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+
+  celery-worker:
+    container_name: sales-celery-worker
+    build:
+      context: .
+    restart: always
+    entrypoint: |
+      /bin/sh -c "
+          celery -A background.celery_app purge -f && 
+          celery -A background.celery_app worker -l info -E --max-memory-per-child=200000 --concurrency=10 --max-tasks-per-child=100
+      "
+    depends_on:
+      - db
+      - redis
+      - api
+    env_file:
+      - .env
+
+volumes:
+  postgres_data:
+  redis_data:

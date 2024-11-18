@@ -1,0 +1,105 @@
+[tool.poetry]
+name = "parserwai-analyzer"
+version = "0.1.0"
+description = ""
+authors = ["boom2132 <denispisenkov88890@gmial.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "3.11.*"
+fastapi = "^0.104.1"
+uvicorn = "^0.24.0.post1"
+ruff = "^0.1.5"
+pydantic-settings = "^2.0.3"
+celery = {extras = ["redis"], version = "^5.3.6"}
+pydantic = {extras = ["email"], version = "^2.5.0"}
+redis = "^5.0.1"
+kombu = "^5.3.4"
+psycopg2-binary = "^2.9.10"
+python-multipart = "^0.0.17"
+python-dotenv = "^1.0.1"
+sqlalchemy = "^2.0.36"
+alembic = "^1.14.0"
+typing-extensions = "^4.12.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.ruff]
+target-version = "py311"
+line-length = 120
+
+exclude = [
+    "migrations",
+    "*_pb2.py",
+    "*_pb2_grpc.py",
+    "*_pb2.pyi"
+]
+
+ignore = [
+    "B008",
+    "B024",
+    "F403",    # star imports
+    "F405",    # probably undefined stuff from star imports
+    "E731",    # lambda expressions
+    "ARG004",  # Unused method argument
+    # TODO: delete below errors from ignore
+    "D102",    # missing dockstring in public method
+    "C901",    # method is too complex
+    # TODO: check it later
+    "A003",    # Class attribute `id` is shadowing a python builtin
+    "SIM105",  # Use `contextlib.suppress` insted of try-except-pass
+    "B904",
+]
+
+select = [
+    "E",    # default
+    "F",    # default
+    "B",    # bugbear, blind-except
+    "Q",    # quotes
+    "A",    # builtins
+    "PT",   # pytest-style
+    "INP",  # pep420
+    "SIM",  # simplify
+    "COM",
+    "T",    # prints
+     "C",   # comprehensions
+]
+
+[tool.ruff.flake8-quotes]
+inline-quotes = "single"
+multiline-quotes = "single"
+
+
+[tool.mypy]
+python_version = "3.11"
+
+exclude = [
+    "migrations",
+    "models",
+    "config.py",
+    "container.py",
+    "pb"
+]
+
+ignore_missing_imports = true
+
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+order-by-type = true
+
+
+[tool.isort]
+py_version=311
+profile = "black"
+combine_as_imports = true
+
+skip = [
+    "migrations",
+    "*_pb2.py",
+    "*_pb2_grpc.py",
+    "*_pb2.pyi"
+]
